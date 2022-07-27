@@ -16,6 +16,8 @@ model User {
   email     String   @unique
   name      String? @unique
   password String
+  photo_url String?
+  admin Boolean @default(false)
 }
 
 

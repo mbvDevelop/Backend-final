@@ -3,8 +3,7 @@ const app  = express();
 app.use(express.json());
 const dotenv = require('dotenv');
 dotenv.config ({path:' ./env'});
-
-
+const cloudinary = require('cloudinary').v2;
 
 app.listen (3000, (req, res) => {
     console.log('SERVER RUNNING IN http://localhost:3000')
@@ -13,7 +12,11 @@ app.listen (3000, (req, res) => {
 const authRoute = require('./app/api/routes/authRoutes');
 app.use('/api/v1/user', authRoute)
 
-
+cloudinary.config({ 
+    cloud_name: 'dv5m9ojtw', 
+    api_key: '386183215645272', 
+    api_secret: 'E-CZ1rW1wIVRMAX7L9k3-J_qBJo' ,
+    secure: true});
 
 
 // app.use ('/resources', express.static('public'));
