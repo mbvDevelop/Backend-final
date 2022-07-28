@@ -1,5 +1,5 @@
 const {PrismaClient} = require('@prisma/client')
-const statusCode = require('../../utils/httpStatusCode')
+const {imageExt} = require('../../utils/fileType.js')
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const prisma = new PrismaClient();
@@ -9,6 +9,7 @@ const uploadFile = async (req, res) => {
     const file = req.file
     let downloadUrl = ""
     let publicId = ""
+    let visualizationURL = ""
 
     // Tiene que haber un archivo para subir un archivo
     if (file != null){
@@ -19,6 +20,9 @@ const uploadFile = async (req, res) => {
                 owner_id: req.user
             },
         })
+        // Comprobar la extension del archivo para determinar si es una imagen o no
+        const filenameArray = file.filename.split(".")
+        const isImage = imageExt.includes(filenameArray[1])
         try {
             // Subir el archivo a cloudinary
             await cloudinary.uploader.upload(file.path, async (error, result) => {
@@ -26,9 +30,22 @@ const uploadFile = async (req, res) => {
                 //Borrar archivo del servidor ya que está en la nube
                 fs.unlinkSync(req.file.path)
                 // Generar url de descarga para almacenarla en la entrada de la BBDD
+                visualizationURL = result.secure_url
                 downloadUrl = cloudinary.url(result.public_id, ({flags : "attachment:" + result.public_id}))
             })
-            // Actualizar la base de datos con la id publica (cloudinary) del archivo y la url de descarga
+            // Actualizar la base de datos con la id publica (cloudinary) del archivo y la url de descarga. Si es un archivo de imagen, se añadira una url de visualización
+            if (isImage) {
+                const updated_entry = await prisma.File.update({
+                    where: {
+                        id: fileEntry.id
+                    }, data: {
+                        download_url: downloadUrl,
+                        public_id: publicId,
+                        preview_url: visualizationURL
+                    }
+                })
+                return res.status(200).send(updated_entry)
+            }
             const updated_entry = await prisma.File.update({
                 where: {
                     id: fileEntry.id
@@ -37,11 +54,10 @@ const uploadFile = async (req, res) => {
                     public_id: publicId
                 }
             })
-            res.status(200).send(updated_entry)
+            return res.status(200).send(updated_entry)
         } catch (error) {
             return res.status(500).send(error)
         }
-        
     }
 }
 

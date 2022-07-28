@@ -4,7 +4,7 @@ const express = require('express');
 const app  = express();
 app.use(express.json());
 const dotenv = require('dotenv');
-dotenv.config ({path:' ./env'});
+dotenv.config();
 const cloudinary = require('cloudinary').v2;
 
 // Rutas 
@@ -19,9 +19,9 @@ app.use('/api/v1/form', formRoutes);
 
 // Configuracion de cloudinary (Esto deberia estar en el .env pero you know)
 cloudinary.config({ 
-    cloud_name: 'dv5m9ojtw', 
-    api_key: '386183215645272', 
-    api_secret: 'E-CZ1rW1wIVRMAX7L9k3-J_qBJo' ,
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.API_KEY, 
+    api_secret: process.env.API_SECRET,
     secure: true
 });
 

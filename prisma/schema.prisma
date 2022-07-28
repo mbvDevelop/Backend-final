@@ -30,6 +30,7 @@ model File {
   download_url String? // URL de descarga del archivo
   owner User @relation(fields: [owner_id], references: [id])
   owner_id Int // Id del usuario propietario del archivo
+  preview_url String? // URL de visualizacion de cloudinary
   }
 
   model ContactForm {

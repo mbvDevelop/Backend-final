@@ -64,7 +64,7 @@ const register = async (req, res) => {
             },
         })
          // Generar un access token con el id del usuario
-        const token = jwt.sign({_id: user.id}, "123");
+        const token = jwt.sign({_id: user.id}, process.env.TOKEN_SALT);
         res.send(token);
     } catch(err) {
         res.status(500).send(statusCode[500]);
@@ -84,7 +84,7 @@ const login = async (req, res) => {
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).send(statusCode[400]);
     // Generar token de acceso con el id del usuario
-    const token = jwt.sign({_id: user.id}, "123");
+    const token = jwt.sign({_id: user.id}, process.env.TOKEN_SALT);
     // Enviar el token de acceso
     res.send(token)
 }

@@ -6,7 +6,7 @@ module.exports = function (req, res, next) {
     const token = req.header('token');
     if(!token) return res.status(401).send("Required access tok");
     try {
-        const user = jwt.verify(token, "123"); // Verificar el token del usuario y obtener el payload
+        const user = jwt.verify(token, process.env.TOKEN_SALT); // Verificar el token del usuario y obtener el payload
         req.user = user._id; // Extraer el id del usuario del payload
         next();
     } catch(err)  {
