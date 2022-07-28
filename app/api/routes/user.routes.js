@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {register, login, deleteUser, getUser, updateUser, updatePicture} = require('../controllers/user.controller');
+const { register, login, deleteUser, getUser, updateUser, updatePicture } = require('../controllers/user.controller');
 const verify = require('../../middlewares/tokenVerify')
 const multer = require('multer');
 
@@ -18,7 +18,7 @@ let config = multer.diskStorage({
 })
 
 // Instancia de multer con la configuracion
-const upload = multer({storage: config});
+const upload = multer({ storage: config });
 
 // Register
 router.post('/register', upload.single('file'), register);

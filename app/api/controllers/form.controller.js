@@ -1,4 +1,4 @@
-const {PrismaClient} = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient();
 
@@ -23,4 +23,4 @@ const sendInquiry = async (req, res) => {
     res.send(form)
 }
 
-module.exports = {sendInquiry}
+module.exports = { sendInquiry }

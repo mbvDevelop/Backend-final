@@ -1,5 +1,5 @@
-const {PrismaClient} = require('@prisma/client')
-const {imageExt} = require('../../utils/fileType.js')
+const { PrismaClient } = require('@prisma/client')
+const { imageExt } = require('../../utils/fileType.js')
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const prisma = new PrismaClient();
@@ -12,10 +12,10 @@ const uploadFile = async (req, res) => {
     let visualizationURL = ""
 
     // Tiene que haber un archivo para subir un archivo
-    if (file != null){
+    if (file != null) {
         // Crear la entrada del archivo con su nombre y asignarlo al id del usuario
         const fileEntry = await prisma.File.create({
-            data : {
+            data: {
                 file_name: file.filename,
                 owner_id: req.user
             },
@@ -31,7 +31,7 @@ const uploadFile = async (req, res) => {
                 fs.unlinkSync(req.file.path)
                 // Generar url de descarga para almacenarla en la entrada de la BBDD
                 visualizationURL = result.secure_url
-                downloadUrl = cloudinary.url(result.public_id, ({flags : "attachment:" + result.public_id}))
+                downloadUrl = cloudinary.url(result.public_id, ({ flags: "attachment:" + result.public_id }))
             })
             // Actualizar la base de datos con la id publica (cloudinary) del archivo y la url de descarga. Si es un archivo de imagen, se añadira una url de visualización
             if (isImage) {
@@ -79,7 +79,7 @@ const deleteFile = async (req, res) => {
     if (!file) {
         return res.status(404).send("not found")
     }
-    try{
+    try {
         // Eliminar el archivo de cloudinary con el public_id
         await cloudinary.uploader.destroy(file.public_id, async (result) => {
             // Eliminar entrada en la base de datos
@@ -141,7 +141,7 @@ const listAllFiles = async (req, res) => {
             },
         },
     })
-    return res.json({page: page , result: results})
+    return res.json({ page: page, result: results })
 }
 
 module.exports = { uploadFile, searchFiles, listAllFiles, deleteFile }

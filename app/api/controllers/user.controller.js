@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {PrismaClient} = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client')
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
@@ -11,10 +11,10 @@ const prisma = new PrismaClient();
 // campo "file" del formulario. 
 const register = async (req, res) => {
     const email = req.body.email;
-    const name  = req.body.name;
-    let password =  req.body.password;
+    const name = req.body.name;
+    let password = req.body.password;
     let photo_url = ""
-    
+
     // Comprobar que los campos necesarios existen
     if (email == null || name == null || password == null) {
         return res.status(400).send("fill the fields");
@@ -23,26 +23,26 @@ const register = async (req, res) => {
     // Comprobar que no existan usuarios con el mismo correo
     const emailExists = await prisma.User.findUnique({
         where: {
-          email: email,
+            email: email,
         },
-      }) 
+    })
 
     // Comprobar que no existan usuarios con el mismo correo
     const nameExists = await prisma.User.findFirst({
         where: {
-          name: name, 
+            name: name,
         },
-      })
+    })
 
     if (emailExists || nameExists) {
         return res.status(400).send("username or email in use");
     }
-   // Si se sube una foto de perfil, almacenarla en cloudinary
+    // Si se sube una foto de perfil, almacenarla en cloudinary
     if (req.file != null) {
         try {
             await cloudinary.uploader.upload(req.file.path, async (error, result) => {
-                    photo_url = result.secure_url // Guardar la url de la imagen para poder mostrarla en el front
-                    fs.unlinkSync(req.file.path) // Eliminar el archivo temporal del directorio del servidor
+                photo_url = result.secure_url // Guardar la url de la imagen para poder mostrarla en el front
+                fs.unlinkSync(req.file.path) // Eliminar el archivo temporal del directorio del servidor
             })
         } catch (error) {
             req.send(error)
@@ -63,10 +63,10 @@ const register = async (req, res) => {
                 photo_url: photo_url
             },
         })
-         // Generar un access token con el id del usuario
-        const token = jwt.sign({_id: user.id}, process.env.TOKEN_SALT);
+        // Generar un access token con el id del usuario
+        const token = jwt.sign({ _id: user.id }, process.env.TOKEN_SALT);
         res.send(token);
-    } catch(err) {
+    } catch (err) {
         res.status(500).send(statusCode[500]);
     }
 };
@@ -76,15 +76,15 @@ const login = async (req, res) => {
     // Buscar el usuario por correo en la base de datos
     const user = await prisma.User.findUnique({
         where: {
-          email: req.body.email,
+            email: req.body.email,
         },
-      })
-      // Si existe comprobar contraseñas con bcrypt
+    })
+    // Si existe comprobar contraseñas con bcrypt
     if (!user) return res.status(400).send(statusCode[400]);
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).send(statusCode[400]);
     // Generar token de acceso con el id del usuario
-    const token = jwt.sign({_id: user.id}, process.env.TOKEN_SALT);
+    const token = jwt.sign({ _id: user.id }, process.env.TOKEN_SALT);
     // Enviar el token de acceso
     res.send(token)
 }
@@ -109,12 +109,12 @@ const getUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         // Eliminacion de la entrada en la BBDD
-    const user = await prisma.User.delete({
-        where: {
-            id: req.user,
-        },
-    })
-    res.status(200).send(statusCode[200])
+        const user = await prisma.User.delete({
+            where: {
+                id: req.user,
+            },
+        })
+        res.status(200).send(statusCode[200])
     } catch (error) {
         res.status(404).send(statusCode[404])
     }
@@ -164,12 +164,12 @@ const updatePicture = async (req, res) => {
             res.status(200).send(updatedUser)
         });
     } catch (error) {
-        res.status(500).send(httpStatusCode[500])
+        res.status(500).send(statusCode[500])
     }
-    
+
 }
 
-module.exports = { 
+module.exports = {
     register,
     login,
     deleteUser,
