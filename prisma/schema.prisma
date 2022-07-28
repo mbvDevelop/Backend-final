@@ -7,8 +7,9 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")  // Dirección para conectarte a la base de datos ubicada en las variables de entorno
 }
+
 
 model User {
   id        Int      @id @default(autoincrement())
@@ -16,8 +17,26 @@ model User {
   email     String   @unique
   name      String? @unique
   password String
-  photo_url String?
-  admin Boolean @default(false)
+  photo_url String? // URL de la imagen de perfil
+  files File[] // Relacion de los archivos del usuario
+  contacts ContactForm[] // Relacion de los contact forms del usuario
 }
 
+model File {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  file_name String // Nombre visible del archivo
+  public_id String? // ID de cloudinary
+  download_url String? // URL de descarga del archivo
+  owner User @relation(fields: [owner_id], references: [id])
+  owner_id Int // Id del usuario propietario del archivo
+  }
 
+  model ContactForm {
+    id Int @id @default(autoincrement())
+    created_at DateTime @default(now())
+    title String // Titulo del formulario 
+    body String // Cuerpo del formulario
+    user User@relation(fields: [user_id], references: [id])
+    user_id Int // Id del usuario que manda el formulario
+  }
